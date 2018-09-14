@@ -7,8 +7,6 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -61,6 +59,9 @@ public class PetProvider extends ContentProvider {
                 throw new IllegalArgumentException("Cannot query unknow URI" + uri);
 
         }
+        //设置自动通知，当uri对应的数据项发生变化时，就知道需要更新游标了
+        cursor.setNotificationUri(getContext().getContentResolver(),uri);
+
         return cursor;
     }
 
@@ -102,6 +103,8 @@ public class PetProvider extends ContentProvider {
             Log.e(LOG_TAG, "Failed to insert row for " + uri);
             return null;
         }
+
+        getContext().getContentResolver().notifyChange(uri,null);
 
         return ContentUris.withAppendedId(uri,6);
     }
