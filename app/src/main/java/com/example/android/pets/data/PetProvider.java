@@ -106,7 +106,7 @@ public class PetProvider extends ContentProvider {
 
         getContext().getContentResolver().notifyChange(uri,null);
 
-        return ContentUris.withAppendedId(uri,6);
+        return ContentUris.withAppendedId(uri,id);
     }
 
     /**
@@ -151,7 +151,11 @@ public class PetProvider extends ContentProvider {
 
         // insert into db
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
-        return db.update(PetContract.PetEntry.TABLE_NAME,values,selection,selectionArgs);
+        int ret = db.update(PetContract.PetEntry.TABLE_NAME,values,selection,selectionArgs);
+
+        getContext().getContentResolver().notifyChange(uri,null);
+
+        return ret;
     }
 
     /**
@@ -160,13 +164,18 @@ public class PetProvider extends ContentProvider {
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        int ret = -1;
         switch (sUriMatcher.match(uri)){
             case PETS:
-                return db.delete(PetContract.PetEntry.TABLE_NAME,selection,selectionArgs);
+                ret = db.delete(PetContract.PetEntry.TABLE_NAME,selection,selectionArgs);
+                getContext().getContentResolver().notifyChange(uri,null);
+                return ret;
             case PET_ID:
                 selection = PetContract.PetEntry._ID + "=?";
                 selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
-                return db.delete(PetContract.PetEntry.TABLE_NAME,selection,selectionArgs);
+                ret = db.delete(PetContract.PetEntry.TABLE_NAME,selection,selectionArgs);
+                getContext().getContentResolver().notifyChange(uri,null);
+                return ret;
             default:
                 throw new IllegalArgumentException("Deletion is not supported for " + uri);
         }
