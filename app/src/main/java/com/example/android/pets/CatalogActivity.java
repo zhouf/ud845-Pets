@@ -78,6 +78,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         petListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.i(TAG, "onItemClick: position=" + position + " id=" + id);
                 Intent intent = new Intent(CatalogActivity.this, EditorActivity.class);
                 Uri currentPetUri = ContentUris.withAppendedId(PetEntry.CONTENT_URI,id);
                 intent.setData(currentPetUri);
@@ -210,6 +211,8 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         return true;
     }
 
+
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // User clicked on a menu option in the app bar overflow menu
@@ -221,10 +224,15 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
                 return true;
             // Respond to a click on the "Delete all entries" menu option
             case R.id.action_delete_all_entries:
-                // Do nothing for now
+                deleteAllPets();
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void deleteAllPets() {
+        int rowsDeleted = getContentResolver().delete(PetEntry.CONTENT_URI, null, null);
+        Log.v("CatalogActivity", rowsDeleted + " rows deleted from pet database");
     }
 
     @Override
